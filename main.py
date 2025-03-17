@@ -37,7 +37,7 @@ async def create_User(user: User, db: db_dependency):
     db.refresh(db_user)
     return {"user created successfully, user: ": db_user}
 
-#getting users
+#getting users with the id 
 @app.get("/users/{user_id}")
 async def get_user(user_id: int, db: db_dependency):
     result = db.query(models.Users).filter(models.Users.id == user_id).first()
@@ -45,6 +45,13 @@ async def get_user(user_id: int, db: db_dependency):
         raise HTTPException(status_code=404, detail="user is not found")
     return result
 
+#getting users with the email
+@app.get("/users/{user_email}")
+async def get_user_by_email(user_email: str, db: db_dependency):
+    result = db.query(models.Users).filter(models.Users.email == user_email.email).first()
+    if not result:
+        raise HTTPException(status_code=404, detail="user is not found")
+    return result
 
     
 
