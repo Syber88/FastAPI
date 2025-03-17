@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
-from typing import List, Annotated, Optional
+from typing import Annotated, Optional, List
 import models 
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -15,6 +15,7 @@ class User(BaseModel):
     email: str
     phone_number: str
     
+    
 class updateUser(BaseModel):
     firstName: Optional[str] = None
     lastName: Optional[str] = None
@@ -22,8 +23,6 @@ class updateUser(BaseModel):
     phone_number: Optional[str] = None
     
     
-    
-
 def getDb():
     db = SessionLocal()
     try:
@@ -104,6 +103,7 @@ async def update_existing_user(user_email: str, user: updateUser, db: Session = 
     
     return {"user updated successfully, user ": db_user}
 
+#deleting user with email
 @app.delete("/users/{user_email}")
 async def delete_user(user_email: str, user: User, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.email == user_email).first()
@@ -114,6 +114,7 @@ async def delete_user(user_email: str, user: User, db: Session = Depends(getDb))
     db.commit()
     return {"user with email "}
 
+#deleting user with email
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: str, user: User, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.id == user_id).first()
@@ -122,6 +123,12 @@ async def delete_user(user_id: str, user: User, db: Session = Depends(getDb)):
     
     db.delete(db_user)
     db.commit()
+    
+#get all users 
+@app.get("/users/", response_model = List[User])
+async def get_all_users(db: Session = Depends(getDb)):
+    users = db.query(models.Users).all()
+    return users
     
 @app.get("/")
 async def root():
