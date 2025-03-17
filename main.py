@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Annotated, Optional, List
 import models 
-from database import engine, SessionLocal
+from database import engine, sessionLocal
 from sqlalchemy.orm import Session
 
 app = FastAPI()
@@ -24,13 +24,13 @@ class updateUser(BaseModel):
     
     
 def getDb():
-    db = SessionLocal()
+    db = sessionLocal()
     try:
         yield db
     finally:
         db.close()
         
-db_dependency = Annotated(Session, Depends(getDb))
+# db_dependency = Annotated(Session, Depends(getDb))
 
 #creating users
 @app.post("/users/")
@@ -39,7 +39,7 @@ async def create_User(user: User, db: Session = Depends(getDb)):
     if current_user:
         raise HTTPException(status_code=400, detail="user already exitsts in the database")
     
-    db_user = models.Users(name=user.name, lastName=user.lastName, email=user.email, phone_number=user.phone_number)
+    db_user = models.Users(name=user.firstName, lastName=user.lastName, email=user.email, phone_number=user.phone_number)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -56,7 +56,7 @@ async def get_user(user_id: int, db: Session = Depends(getDb)):
 #getting users with the email
 @app.get("/users/{user_email}")
 async def get_user_by_email(user_email: str, db: Session = Depends(getDb)):
-    result = db.query(models.Users).filter(models.Users.email == user_email.email).first()
+    result = db.query(models.Users).filter(models.Users.email == user_email).first()
     if not result:
         raise HTTPException(status_code=404, detail="user is not found")
     return result
@@ -71,11 +71,11 @@ async def update_existing_user(user_id: int, user: updateUser, db: Session = Dep
     if user.firstName:
         db_user.firstName = user.firstName
     if user.lastName:
-        db_user.name = user.lastName
+        db_user.lastName = user.lastName
     if user.email:
-        db_user.name = user.email
+        db_user.email = user.email
     if user.phone_number:
-        db_user.name = user.phone_number
+        db_user.phone_number = user.phone_number
         
     db.commit()
     db.refresh(db_user)
@@ -92,11 +92,11 @@ async def update_existing_user(user_email: str, user: updateUser, db: Session = 
     if user.firstName:
         db_user.firstName = user.firstName
     if user.lastName:
-        db_user.name = user.lastName
+        db_user.lastName = user.lastName
     if user.email:
-        db_user.name = user.email
+        db_user.email = user.email
     if user.phone_number:
-        db_user.name = user.phone_number
+        db_user.phone_number = user.phone_number
         
     db.commit()
     db.refresh(db_user)
