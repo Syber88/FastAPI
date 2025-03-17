@@ -39,14 +39,14 @@ async def create_User(user: User, db: Session = Depends(getDb)):
     if current_user:
         raise HTTPException(status_code=400, detail="user already exitsts in the database")
     
-    db_user = models.Users(name=user.firstName, lastName=user.lastName, email=user.email, phone_number=user.phone_number)
+    db_user = models.Users(firstName=user.firstName, lastName=user.lastName, email=user.email, phone_number=user.phone_number)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return {"user created successfully, user: ": db_user}
 
 #getting users with the id 
-@app.get("/users/{user_id}")
+@app.get("/users/by-id{user_id}")
 async def get_user(user_id: int, db: Session = Depends(getDb)):
     result = db.query(models.Users).filter(models.Users.id == user_id).first()
     if not result:
@@ -54,7 +54,7 @@ async def get_user(user_id: int, db: Session = Depends(getDb)):
     return result
 
 #getting users with the email
-@app.get("/users/{user_email}")
+@app.get("/users/by-email/{user_email}")
 async def get_user_by_email(user_email: str, db: Session = Depends(getDb)):
     result = db.query(models.Users).filter(models.Users.email == user_email).first()
     if not result:
@@ -62,7 +62,7 @@ async def get_user_by_email(user_email: str, db: Session = Depends(getDb)):
     return result
 
 #updating user with user id
-@app.post("/user/{user_id}")
+@app.post("/users/by-id{user_id}")
 async def update_existing_user(user_id: int, user: updateUser, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.id == user_id).first()
     if not db_user:
@@ -83,7 +83,7 @@ async def update_existing_user(user_id: int, user: updateUser, db: Session = Dep
     return {"user updated successfully, user ": db_user}
 
 #updating user with email
-@app.post("/user/{user_email}")
+@app.post("/users/by-email/{user_email}")
 async def update_existing_user(user_email: str, user: updateUser, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.email == user_email).first()
     if not db_user:
@@ -104,18 +104,18 @@ async def update_existing_user(user_email: str, user: updateUser, db: Session = 
     return {"user updated successfully, user ": db_user}
 
 #deleting user with email
-@app.delete("/users/{user_email}")
-async def delete_user(user_email: str, user: User, db: Session = Depends(getDb)):
+@app.delete("/users/by-email/{user_email}")
+async def delete_user(user_email: str, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.email == user_email).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="user is not found")
     
     db.delete(db_user)
     db.commit()
-    return {"user with email "}
+    return {f"user with email {user_email} deleted"}
 
 #deleting user with email
-@app.delete("/users/{user_id}")
+@app.delete("/users/by-id/{user_id}")
 async def delete_user(user_id: str, user: User, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.id == user_id).first()
     if not db_user:
