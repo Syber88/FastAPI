@@ -62,7 +62,7 @@ async def get_user_by_email(user_email: str, db: Session = Depends(getDb)):
         raise HTTPException(status_code=404, detail="user is not found")
     return result
 
-#updating user 
+#updating user with user id
 @app.post("/user/{user_id}")
 async def update_existing_user(user_id: int, user: updateUser, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.id == user_id).first()
@@ -82,12 +82,27 @@ async def update_existing_user(user_id: int, user: updateUser, db: Session = Dep
     db.refresh(db_user)
     
     return {"user updated successfully, user ": db_user}
-    
-    
-    
 
-
+#updating user with email
+@app.post("/user/{user_email}")
+async def update_existing_user(user_email: str, user: updateUser, db: Session = Depends(getDb)):
+    db_user = db.query(models.Users).filter(models.Users.id == user_email).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="user is not found")
     
+    if user.firstName:
+        db_user.firstName = user.firstName
+    if user.lastName:
+        db_user.name = user.lastName
+    if user.email:
+        db_user.name = user.email
+    if user.phone_number:
+        db_user.name = user.phone_number
+        
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"user updated successfully, user ": db_user}
 
 @app.get("/")
 async def root():
