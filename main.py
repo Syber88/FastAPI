@@ -104,6 +104,15 @@ async def update_existing_user(user_email: str, user: updateUser, db: Session = 
     
     return {"user updated successfully, user ": db_user}
 
+@app.delete("/users/{user_email}")
+async def delete_user(user_email: str, user: User, db: Session = Depends(getDb)):
+    db_user = db.query(models.Users).filter(models.Users.email == user.email).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="user is not found")
+    
+    db.delete(db_user)
+    db.commit()
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
