@@ -24,13 +24,28 @@ def getDb():
         
 db_dependency = Annotated(Session, Depends(getDb))
 
+#creating users
 @app.post("/users/")
 async def create_User(user: User, db: db_dependency):
+    current_user = db.query(models.Users).filter(models.Users.email == user.email).first()
+    if current_user:
+        raise HTTPException(status_code=400, detail="user already exitsts in the database")
+    
     db_user = models.Users(name=user.name, lastName=user.lastName, email=user.email, phone_number=user.phone_number)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return {"user created successfully, user: ": db_user}
+
+#getting users
+@app.get("/users/{user_id}")
+async def get_user(user_id: int, db: db_dependency):
+    result = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not result:
+        raise HTTPException(status_code=404, detail="user is not found")
+    return result
+
+
     
 
 @app.get("/")
