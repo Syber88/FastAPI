@@ -62,7 +62,7 @@ async def get_user_by_email(user_email: str, db: Session = Depends(getDb)):
     return result
 
 #updating user with user id
-@app.post("/users/by-id{user_id}")
+@app.put("/users/by-id{user_id}")
 async def update_existing_user(user_id: int, user: updateUser, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.id == user_id).first()
     if not db_user:
@@ -83,7 +83,7 @@ async def update_existing_user(user_id: int, user: updateUser, db: Session = Dep
     return {"user updated successfully, user ": db_user}
 
 #updating user with email
-@app.post("/users/by-email/{user_email}")
+@app.put("/users/by-email/{user_email}")
 async def update_existing_user(user_email: str, user: updateUser, db: Session = Depends(getDb)):
     db_user = db.query(models.Users).filter(models.Users.email == user_email).first()
     if not db_user:
