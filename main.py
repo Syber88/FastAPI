@@ -123,6 +123,7 @@ async def delete_user(user_id: str, user: User, db: Session = Depends(getDb)):
     
     db.delete(db_user)
     db.commit()
+    return {f"user with email {user_id} deleted"}
     
 #get all users 
 @app.get("/users/", response_model = List[User])

@@ -1,24 +1,21 @@
 import unittest
 from fastapi.testclient import TestClient
-from main import app  # make sure to import your FastAPI app
+from main import app 
 
 client = TestClient(app)
 
 class TestUserEndpoints(unittest.TestCase):
 
     def setUp(self):
-        # You can set up any test data or state here
         self.test_user = {
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "john.doe@example.com",
+            "firstName": "Siya",
+            "lastName": "Syber",
+            "email": "Siya.syber@testing.com",
             "phone_number": "1234567890"
         }
-        # Create the user before running get/update/delete tests
         client.post("/users/", json=self.test_user)
 
     def test_create_user_duplicate(self):
-        # Should raise 400 since user already exists
         response = client.post("/users/", json=self.test_user)
         self.assertEqual(response.status_code, 400)
         self.assertIn("user already exitsts", response.text)
